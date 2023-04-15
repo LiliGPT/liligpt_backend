@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  db:
+    image: postgres:alpine
+    container_name: nestgpt_backend_db
+    ports:
+      - ${DB_PORT}:5432
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - nestgpt_backend_db_data:/var/lib/postgresql/data
+
+volumes:
+  nestgpt_backend_db_data:

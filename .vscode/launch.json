@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Attach to Docker Logs",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start:debug",
+      ],
+      "console": "integratedTerminal",
+      "preLaunchTask": "docker:start",
+      "postDebugTask": "docker:stop",
+      "envFile": "${workspaceFolder}/.env",
+    }
+  ],
+}

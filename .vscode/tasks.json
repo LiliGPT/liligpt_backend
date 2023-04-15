@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "docker:start",
+      "label": "docker:start",
+      "detail": "npm run docker:start",
+    },
+    {
+      "type": "npm",
+      "script": "docker:stop",
+      "label": "docker:stop",
+      "detail": "npm run docker:stop",
+    },
+  ]
+}
