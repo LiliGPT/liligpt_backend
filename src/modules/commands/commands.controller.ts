@@ -4,7 +4,7 @@ import { PackageJsonCommand } from './packageJson.command';
 
 @Controller('/commands')
 export class CommandsController {
-  constructor(private readonly packageJsonCommand: PackageJsonCommand) { }
+  constructor(private readonly packageJsonCommand: PackageJsonCommand) {}
 
   @Post('/createPackageJsonCommand')
   createPackageJsonCommand(@Body() command: CreatePackageJsonCommandDto): any {

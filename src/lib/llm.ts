@@ -4,7 +4,7 @@ import { OpenAI } from 'langchain/llms/openai';
 class LLM {
   openai?: OpenAI;
 
-  constructor() { }
+  constructor() {}
 
   getLLM(): OpenAI {
     if (!this.openai) {

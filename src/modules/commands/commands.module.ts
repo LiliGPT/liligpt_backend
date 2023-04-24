@@ -7,4 +7,4 @@ import { PackageJsonCommand } from './packageJson.command';
   providers: [PackageJsonCommand],
   controllers: [CommandsController],
 })
-export class CommandsModule { }
+export class CommandsModule {}

@@ -10,13 +10,12 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = new ConfigService();
-  const port = configService.get('PORT') || 3000;
-  const logger = new Logger('bootstrap');
-
   app.useGlobalPipes(new ValidationPipe());
+  const configService = app.get(ConfigService);
+  const port = configService.getOrThrow('APP_PORT');
   await app.listen(port);
 
+  const logger = new Logger('bootstrap');
   logger.log(`Starting server on port ${port}`);
 }
 bootstrap();
