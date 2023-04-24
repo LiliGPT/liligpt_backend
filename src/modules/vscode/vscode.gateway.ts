@@ -14,6 +14,8 @@ import {
   VSCODE_NONCE,
   VSCODE_NONCE_EXPIRATION_SECONDS,
 } from './vscode.constants';
+import { OnEvent } from '@nestjs/event-emitter';
+import { SendAuthToVscodeDto, SharedVscodeAuthDto } from './vscode.dto';
 
 @WebSocketGateway(28181, { transports: ['websocket'] })
 export class VscodeGateway {
@@ -26,12 +28,39 @@ export class VscodeGateway {
 
   // TODO: test this method
   @SubscribeMessage('vscode:register-for-auth')
-  registerForAuth(@MessageBody() nonce: string): void {
+  registerForAuth(
+    @MessageBody() nonce: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
     this.logger.debug(`[vscode:register-for-auth] ${nonce}`);
     this.cacheManager.set(
       `${VSCODE_NONCE}_${nonce}`,
-      true,
+      client.id,
       VSCODE_NONCE_EXPIRATION_SECONDS,
     );
+  }
+
+  @OnEvent('vscode:auth')
+  async handleAuthEvent(payload: SendAuthToVscodeDto): Promise<void> {
+    this.logger.debug(`[vscode:auth] ${payload.nonce}`);
+    const socketId: string = await this.cacheManager.get(
+      `${VSCODE_NONCE}_${payload.nonce}`,
+    );
+    const client = this.server.sockets.sockets.get(socketId);
+
+    if (client) {
+      client.emit(
+        'vscode:auth',
+        new SharedVscodeAuthDto({
+          accessToken: payload.accessToken,
+          refreshToken: payload.refreshToken,
+        }),
+      );
+      this.cacheManager.del(`${VSCODE_NONCE}_${payload.nonce}`);
+      this.logger.debug(`[vscode:auth] ${payload.nonce} - done`);
+      return;
+    }
+
+    throw new Error('Invalid vscode:auth event.');
   }
 }

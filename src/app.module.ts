@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CommandsModule } from './modules/commands/commands.module';
 import { VscodeModule } from './modules/vscode/vscode.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { CacheModule } from '@nestjs/cache-manager';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    CacheModule.register(),
+    EventEmitterModule.forRoot(),
     VscodeModule,
     CommandsModule,
   ],

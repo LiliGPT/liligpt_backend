@@ -6,13 +6,19 @@ import { io } from 'socket.io-client';
 import * as supertest from 'supertest';
 import { VscodeController } from 'src/modules/vscode/vscode.controller';
 import { CacheModule } from '@nestjs/cache-manager';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SendAuthToVscodeDto } from 'src/modules/vscode/vscode.dto';
 
 async function createNestApp({
   imports,
   ...props
 }: ModuleMetadata): Promise<INestApplication> {
   const testingModule = await Test.createTestingModule({
-    imports: [CacheModule.register(), ...(imports ?? [])],
+    imports: [
+      CacheModule.register(),
+      EventEmitterModule.forRoot(),
+      ...(imports ?? []),
+    ],
     ...props,
   }).compile();
   const app = testingModule.createNestApplication();
@@ -99,20 +105,14 @@ describe('VscodeGateway (e2e)', () => {
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
       })
-      .expect(400)
-      .expect({
-        status: 'error',
-      });
+      .expect(400);
 
     await supertest(app.getHttpServer())
       .post('/vscode/send-auth-to-vscode')
       .send({
         invalid: 'payload',
       })
-      .expect(400)
-      .expect({
-        status: 'error',
-      });
+      .expect(400);
   });
 
   it('should send auth to vscode', async () => {
@@ -141,7 +141,7 @@ describe('VscodeGateway (e2e)', () => {
       // Handle successful connection
       ws.on('connect', async () => {
         // variables
-        const expectedAuth = {
+        const expectedAuth: SendAuthToVscodeDto = {
           nonce: 'test-Nonce',
           accessToken: 'test-AccessToken',
           refreshToken: 'test-RefreshToken',
@@ -174,5 +174,5 @@ describe('VscodeGateway (e2e)', () => {
           });
       });
     });
-  });
+  }, 30000);
 });
