@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+  liligpt_backend:
+    container_name: liligpt_backend
+    image: node:18-alpine
+    restart: unless-stopped
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ['yarn', '--production', ';', 'node', '/app/dist/main.js']
+    environment:
+      - NODE_ENV=production
+      - APP_PORT=28180
+      - WS_PORT=28181
+    ports:
+      - 28180:28180
+      - 28181:28181
+    
