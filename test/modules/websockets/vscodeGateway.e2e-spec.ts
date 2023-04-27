@@ -7,7 +7,10 @@ import * as supertest from 'supertest';
 import { VscodeController } from 'src/modules/vscode/vscode.controller';
 import { CacheModule } from '@nestjs/cache-manager';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { SendAuthToVscodeDto } from 'src/modules/vscode/vscode.dto';
+import {
+  SendAuthToVscodeDto,
+  SharedVscodeAuthDto,
+} from 'src/modules/vscode/vscode.dto';
 
 async function createNestApp({
   imports,
@@ -141,16 +144,21 @@ describe('VscodeGateway (e2e)', () => {
       // Handle successful connection
       ws.on('connect', async () => {
         // variables
-        const expectedAuth: SendAuthToVscodeDto = {
-          nonce: 'test-Nonce',
+        const nonce = 'test-Nonce';
+        const sendAuthPayload: SendAuthToVscodeDto = {
+          nonce,
           accessToken: 'test-AccessToken',
           refreshToken: 'test-RefreshToken',
         };
+        const expectedAuthPayload: SharedVscodeAuthDto = {
+          accessToken: sendAuthPayload.accessToken,
+          refreshToken: sendAuthPayload.refreshToken,
+        };
         // register for auth
-        ws.emit('vscode:register-for-auth', expectedAuth.nonce);
+        ws.emit('vscode:register-for-auth', nonce);
         // wait for auth
         ws.on('vscode:auth', (auth) => {
-          expect(auth).toEqual(expectedAuth);
+          expect(auth).toEqual(expectedAuthPayload);
           resolve();
         });
         // send invalid auth
@@ -167,7 +175,7 @@ describe('VscodeGateway (e2e)', () => {
         // send valid auth
         await supertest(app.getHttpServer())
           .post('/vscode/send-auth-to-vscode')
-          .send(expectedAuth)
+          .send(sendAuthPayload)
           .expect(200)
           .catch((err) => {
             reject(err);

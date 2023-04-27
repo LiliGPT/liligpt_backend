@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { CommandsModule } from './modules/commands/commands.module';
 import { VscodeModule } from './modules/vscode/vscode.module';
-import { CacheModule } from '@nestjs/cache-manager';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
