@@ -28,16 +28,20 @@ export class VscodeGateway {
 
   // TODO: test this method
   @SubscribeMessage('vscode:register-for-auth')
-  registerForAuth(
+  async registerForAuth(
     @MessageBody() nonce: string,
     @ConnectedSocket() client: Socket,
-  ): void {
-    this.logger.debug(`[vscode:register-for-auth] ${nonce}`);
-    this.cacheManager.set(
-      `${VSCODE_NONCE}_${nonce}`,
+  ): Promise<void> {
+    const fullNonceKey = `${VSCODE_NONCE}_${nonce}`;
+    this.logger.debug(`[vscode:register-for-auth] ${fullNonceKey} - ${client.id}`);
+    await this.cacheManager.set(
+      fullNonceKey,
       client.id,
-      VSCODE_NONCE_EXPIRATION_SECONDS,
+      VSCODE_NONCE_EXPIRATION_SECONDS * 1000,
     );
+    // debug
+    const fullNonce = await this.cacheManager.get(`${VSCODE_NONCE}_${nonce}`);
+    this.logger.debug(`[vscode:register-for-auth] res: ${fullNonce}`);
   }
 
   @OnEvent('vscode:auth')

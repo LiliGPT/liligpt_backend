@@ -4,6 +4,7 @@ import {
   Controller,
   HttpCode,
   Inject,
+  Logger,
   Post,
 } from '@nestjs/common';
 import { SendAuthToVscodeDto, SendAuthToVscodeResponseDto } from './vscode.dto';
@@ -14,6 +15,8 @@ import { Cache } from 'cache-manager';
 
 @Controller('/vscode')
 export class VscodeController {
+  private readonly logger = new Logger(VscodeController.name);
+
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly eventEmitter: EventEmitter2,
@@ -28,11 +31,12 @@ export class VscodeController {
       throw new BadRequestException('Missing nonce');
     }
 
-    const nonceExists = await this.cacheManager.get(
-      `${VSCODE_NONCE}_${payload.nonce}`,
-    );
+    const fullNonce = `${VSCODE_NONCE}_${payload.nonce}`;
+
+    const nonceExists = await this.cacheManager.get(fullNonce);
 
     if (!nonceExists) {
+      this.logger.debug(`Nonce does not exist: "${fullNonce}"`);
       throw new BadRequestException('Invalid nonce');
     }
 
