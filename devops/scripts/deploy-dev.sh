@@ -5,8 +5,8 @@
 
 # Running:
 # 1.
-# Define the env variables using `.env.example` as a template.
-# 
+# Create the file `devops/scripts/.env`
+# using the example file at `devops/scripts/.env.example`
 # 2.
 # then run:
 # bash devops/scripts/deploy-dev.sh
@@ -17,13 +17,15 @@ function main() {
 
   # load env
   set -a
-  source "$ROOT/.env"
+  source "$HERE/.env" || \
+    die "Failed to load env file"
   set +a
 
   echo "DEV_SERVER_IP=$DEV_SERVER_IP"
   echo "DEV_SERVER_USER=$DEV_SERVER_USER"
   echo "DEV_SERVER_KEY=$DEV_SERVER_KEY"
   echo "DEV_SERVER_DEPLOY_DIR=$DEV_SERVER_DEPLOY_DIR"
+  echo "APP_PUBLIC_URL=$APP_PUBLIC_URL"
   echo ""
 
   # build
